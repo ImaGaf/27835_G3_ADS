@@ -1,4 +1,3 @@
-
 # Actas de Reunión - Proyecto PagoSeguro
 
 Esta carpeta contiene la documentación oficial y técnica relacionada con las reuniones y revisiones de requisitos del sistema PagoSeguro, incluyendo las últimas actualizaciones aprobadas por el comité del proyecto.
