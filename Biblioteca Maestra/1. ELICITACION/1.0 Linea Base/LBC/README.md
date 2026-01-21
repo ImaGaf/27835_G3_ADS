@@ -1,4 +1,4 @@
-# Línea Base LBC - Implementación
+# Proyecto PagoSeguro - Línea Base LBC - Implementación
 
 Aquí se encuentra todo el código fuente y scripts del proyecto, organizado para el desarrollo y pruebas.
 
