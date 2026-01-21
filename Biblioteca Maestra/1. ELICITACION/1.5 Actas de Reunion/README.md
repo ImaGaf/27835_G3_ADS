@@ -24,7 +24,7 @@ Tras la sesión de análisis, se han fortalecido los siguientes apartados para g
 
 ## Responsables
 
-- Oswaldo Tipán (Gerente Granito Agrotac)
+- Oswaldo Tipán 
 - Fernando Sandoval
 - Simoné Medina
 - Zaith Manangón
