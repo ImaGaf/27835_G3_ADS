@@ -1,4 +1,4 @@
-# Frontend simple para Sistema Roles
+# Proyecto PagoSeguro - Frontend simple para Sistema Roles
 
 Pequeña interfaz estática que consume la API en `http://127.0.0.1:3000`.
 
