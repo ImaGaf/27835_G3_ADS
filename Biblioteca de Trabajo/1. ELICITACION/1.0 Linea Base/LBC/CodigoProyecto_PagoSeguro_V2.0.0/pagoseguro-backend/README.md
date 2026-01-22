@@ -1,4 +1,4 @@
-# PagoSeguroAGROTAC - Backend
+# Proyecto PagoSeguro - Backend
 
 Sistema de gestión de pagos y créditos para El Granito de AGROTAC.
 
