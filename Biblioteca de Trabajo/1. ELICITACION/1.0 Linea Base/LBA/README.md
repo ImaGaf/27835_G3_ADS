@@ -22,8 +22,7 @@ Los diagramas se han organizado por tipo de usuario con el objetivo de facilitar
 Oswaldo Tipán, Fernando Sandoval, Zaith Manangón, Simone Medina
 
 ##Versionamiento
-## 📜 Historial de Versiones del SRS
-
+## 📜 Historial de Versiones 
 | Versión        | Fecha       | Responsable      | Aprobado por                         |
 |---------------|------------|------------------|--------------------------------------|
 |Flujo_actividades_1.0.pdf |02/01/2026 | Simoné Medina    | Simoné Medina      |
