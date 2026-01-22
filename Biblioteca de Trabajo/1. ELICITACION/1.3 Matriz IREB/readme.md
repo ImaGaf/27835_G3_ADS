@@ -19,7 +19,7 @@ Este directorio contiene los documentos que forman parte del Elemento de Configu
 | Versión                   | Fecha      | Responsable     | Aprobado por  |
 | ------------------------- | ---------- | --------------- | ------------- |
 | G3_Matriz_IREB_V1.0.xlsx  | 20/10/2025 | Simone Medina   | Tipán Oswaldo |
-| G3_Informe_Matriz (1).pdf | 20/10/2025 | Zaith Mandangón | Tipán Oswaldo |
+| G3_Informe_Matriz (1).pdf | 20/10/2025 | Zaith Manangón | Tipán Oswaldo |
 
 Estas versiones reflejan la evolución del análisis de requisitos conforme al enfoque propuesto por el estándar IREB. Cada versión representa una validación formal en la línea base de requisitos.
 
