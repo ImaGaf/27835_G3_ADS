@@ -14,4 +14,4 @@ Este repositorio contiene el desarrollo del sistema **Pago Seguro AGROTAC**. Se 
 * **Oswaldo Tipán** 
 * **Fernando Sandoval** 
 * **Zaith Manangón**
-* [cite_start]**Simone Medina**
+* **Simone Medina**
