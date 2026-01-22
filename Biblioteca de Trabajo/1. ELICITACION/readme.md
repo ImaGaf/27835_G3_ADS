@@ -1,4 +1,4 @@
-**Biblioteca de Trabajo /Elicitación*
+**Biblioteca de Trabajo /Elicitación**
 
 Esta carpeta contiene la biblioteca de trabajo del proyecto **Granito**, un sistema de registro de cobros. Aquí se organiza toda la documentación y evidencias necesarias para el análisis, diseño, planificación y control del proyecto.
 
