@@ -1,39 +1,38 @@
-Gestión de Configuración (G3_PGC)
-Este repositorio contiene la documentación y el análisis de calidad para el proyecto de desarrollo móvil del Grupo 3.
+# Certificado de Autenticidad – Proyecto PagoSeguro
 
-Información General
+Este documento certifica la originalidad y autoría del proyecto **PagoSeguro**, desarrollado como parte del curso de desarrollo móvil por el Grupo 3 de la Universidad de las Fuerzas Armadas ESPE.
 
-Nombre del documento: G3_PGC_V_1.3.docx
+## Información del Proyecto
 
-Institución: Universidad de las Fuerzas Armadas ESPE
+- **Nombre del proyecto:** PagoSeguro
+- **Institución:** Universidad de las Fuerzas Armadas ESPE
+- **Fecha de inicio:** 22 de enero de 2026
+- **ID del documento:** 5a267b6a2a4472f7f50abc8ff18ed14f2ac57f31
 
-Fecha de inicio: 22 de enero de 2026
+## Descripción
 
-ID del documento: 5a267b6a2a4472f7f50abc8ff18ed14f2ac57f31
+PagoSeguro es una aplicación móvil orientada a facilitar pagos electrónicos de manera segura, eficiente y confiable. El proyecto abarca el desarrollo de un sistema completo, incluyendo backend, frontend y documentación técnica.
 
-Responsables
-Fernando Sandoval
+## Objetivos
 
-Tipán Oswaldo
+- Desarrollar una solución móvil para pagos electrónicos.
+- Garantizar la seguridad y privacidad de los usuarios.
+- Cumplir con los estándares de calidad y buenas prácticas de desarrollo.
 
-Simone Medina
+## Responsables
 
-Zaith Mandangón
+- Fernando Sandoval
+- Oswaldo Tipán
+- Simone Medina
+- Zaith Mandangón
 
-Resumen del Análisis de Originalidad
+## Resumen de Originalidad
 
-Similitud detectada: 4%
+- **Similitud detectada:** 4%
+- **Textos sospechosos:** 7%
+- **Detección de IA:** 0%
+- **Total de palabras:** 3217
 
-Textos sospechosos: 7%
+---
 
-Detección de IA: 0%
-
-Total de palabras: 3217
-
-Fuente principal: oa.upm.es
-
-Enlaces de Referencia
-
-Repositorio de soporte: GitHub - G3_ADS
-
-Gestión del proyecto: Jira Board - Grupo 3
+Este certificado respalda la autenticidad del trabajo presentado y su alineación con los objetivos académicos del curso.
