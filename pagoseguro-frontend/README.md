@@ -1,117 +1,73 @@
-# PagoSeguroAGROTAC - Frontend
+# Welcome to your Lovable project
 
-Sistema de gestión de pagos y créditos para El Granito de AGROTAC.
+## Project info
 
-## 🚀 Stack Tecnológico
+**URL**: https://lovable.dev/projects/005d0a8a-c32d-40c2-8213-952b26c64fba
 
-- **React 18** - UI Library
-- **TypeScript** - Type Safety
-- **Vite** - Build Tool
-- **Tailwind CSS** - Styling
-- **React Router** - Routing
-- **Zustand** - State Management
-- **React Hook Form** - Form Handling
-- **Zod** - Schema Validation
-- **Axios** - HTTP Client
-- **Lucide React** - Icons
+## How can I edit this code?
 
-## 📋 Prerequisitos
+There are several ways of editing your application.
 
-- Node.js >= 20.0.0
-- npm >= 10.0.0
+**Use Lovable**
 
-## ⚙️ Instalación
+Simply visit the [Lovable Project](https://lovable.dev/projects/005d0a8a-c32d-40c2-8213-952b26c64fba) and start prompting.
 
-```bash
-# Instalar dependencias
-npm install
+Changes made via Lovable will be committed automatically to this repo.
 
-# Configurar variables de entorno
-cp .env.example .env
-# Editar .env con tus configuraciones
+**Use your preferred IDE**
+
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+
+Follow these steps:
+
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
+
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
+
+# Step 3: Install the necessary dependencies.
+npm i
+
+# Step 4: Start the development server with auto-reloading and an instant preview.
+npm run dev
 ```
 
-## 🎯 Scripts Disponibles
+**Edit a file directly in GitHub**
 
-```bash
-# Desarrollo
-npm run dev              # Iniciar servidor de desarrollo
+- Navigate to the desired file(s).
+- Click the "Edit" button (pencil icon) at the top right of the file view.
+- Make your changes and commit the changes.
 
-# Build
-npm run build            # Compilar para producción
-npm run preview          # Preview de producción
+**Use GitHub Codespaces**
 
-# Linting
-npm run lint             # Verificar código
-```
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## 🌐 Configuración
+## What technologies are used for this project?
 
-Edita el archivo `.env`:
+This project is built with:
 
-```env
-VITE_API_URL=http://localhost:3000/api/v1
-VITE_ENV=development
-```
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
 
-## 📁 Estructura del Proyecto
+## How can I deploy this project?
 
-```
-src/
-├── components/          # Componentes reutilizables
-│   ├── auth/           # Componentes de autenticación
-│   ├── common/         # Componentes comunes
-│   └── layout/         # Layouts
-├── pages/              # Páginas principales
-│   ├── auth/           # Páginas de autenticación
-│   └── dashboard/      # Dashboards por rol
-├── hooks/              # Custom hooks
-├── stores/             # Estado global (Zustand)
-├── services/           # Servicios HTTP
-├── schemas/            # Validaciones Zod
-├── types/              # TypeScript types
-├── utils/              # Utilidades
-└── assets/             # Assets estáticos
-```
+Simply open [Lovable](https://lovable.dev/projects/005d0a8a-c32d-40c2-8213-952b26c64fba) and click on Share -> Publish.
 
-## 🔐 Autenticación
+## Can I connect a custom domain to my Lovable project?
 
-El sistema implementa autenticación basada en JWT con:
-- Access tokens (15 minutos)
-- Refresh tokens (7 días)
-- Rutas protegidas por rol
-- Redirección automática
+Yes, you can!
 
-## 🎨 Diseño
+To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
-- Paleta de colores verde institucional
-- Diseño responsive
-- Accesibilidad WCAG 2.1
-- Componentes reutilizables con Tailwind
-
-## 🧪 Testing
-
-```bash
-npm test                 # Ejecutar tests
-npm run test:coverage    # Cobertura
-```
-
-## 📦 Build para Producción
-
-```bash
-npm run build
-```
-
-Los archivos optimizados estarán en la carpeta `dist/`
-
-## 🚀 Deploy
-
-El proyecto puede desplegarse en:
-- Vercel
-- Netlify
-- GitHub Pages
-- Servidor propio (Nginx/Apache)
-
-## 📝 Licencia
-
-MIT - Grupo 3 AGROTAC
+Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
