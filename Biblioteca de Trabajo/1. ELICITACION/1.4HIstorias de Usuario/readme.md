@@ -1,10 +1,10 @@
-# Historias de Usuario (HUS)
+# Historias de Usuario (HU)
 
 Este directorio contiene los documentos que forman parte del Elemento de Configuración del Software (ECS) relacionado con las historias de usuario del proyecto.
 
 ## Información del ECS
 
-- **Código del ECS:** HUS
+- **Código del ECS:** HU
 - **Nombre del ECS:** Historias de Usuario
 - **Responsables:** Fernando Sandoval, Tipán Oswaldo, Simone Medina, Zaith Mandangón
 - **Proyecto:** [Nombre de tu proyecto]
