@@ -4,19 +4,22 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  CreditCard, 
-  DollarSign, 
-  Calendar, 
+import {
+  CreditCard,
+  DollarSign,
+  Calendar,
   TrendingUp,
   AlertCircle,
   CheckCircle2,
   FileText,
-  History
+  History,
+  Upload
 } from 'lucide-react';
 import { creditService } from '@/lib/credits.backend';
 import { paymentService } from '@/lib/payments.backend';
 import { PaymentHistory } from '@/components/payments/PaymentHistory';
+import { PaymentVoucherUpload } from '@/components/vouchers/PaymentVoucherUpload';
+import { VoucherHistory } from '@/components/vouchers/VoucherHistory';
 
 type User = {
   id: string | number;
@@ -32,6 +35,7 @@ export const ClientDashboard = ({ user, onNavigate }: ClientDashboardProps) => {
   const [credits, setCredits] = useState<any[]>([]);
   const [pendingPayments, setPendingPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   useEffect(() => {
     const loadClientData = async () => {
@@ -100,8 +104,8 @@ export const ClientDashboard = ({ user, onNavigate }: ClientDashboardProps) => {
         </div>
 
         {/* Pestañas principales */}
-        <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-green-50 border border-green-200">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-4 bg-green-50 border border-green-200">
             <TabsTrigger value="dashboard" className="flex items-center gap-2 data-[state=active]:bg-green-600 data-[state=active]:text-white">
               <TrendingUp className="h-4 w-4" />
               Resumen
@@ -110,9 +114,13 @@ export const ClientDashboard = ({ user, onNavigate }: ClientDashboardProps) => {
               <CreditCard className="h-4 w-4" />
               Créditos
             </TabsTrigger>
+            <TabsTrigger value="vouchers" className="flex items-center gap-2 data-[state=active]:bg-green-600 data-[state=active]:text-white">
+              <Upload className="h-4 w-4" />
+              Comprobantes
+            </TabsTrigger>
             <TabsTrigger value="payments" className="flex items-center gap-2 data-[state=active]:bg-green-600 data-[state=active]:text-white">
               <History className="h-4 w-4" />
-              Historial de Pagos
+              Historial
             </TabsTrigger>
           </TabsList>
 
@@ -211,23 +219,23 @@ export const ClientDashboard = ({ user, onNavigate }: ClientDashboardProps) => {
             )}
 
             {/* Acciones rápidas */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-in-right" style={{ animationDelay: '0.7s' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-in-right" style={{ animationDelay: '0.7s' }}>
               <Card className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-green-100 animate-bounce-in" style={{ animationDelay: '0.8s' }}>
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <CreditCard className="h-5 w-5 text-green-600" />
-                    <span>Realizar Pago</span>
+                    <Upload className="h-5 w-5 text-green-600" />
+                    <span>Subir Comprobante</span>
                   </CardTitle>
                   <CardDescription>
-                    Pague sus cuotas de forma rápida y segura
+                    Registre su comprobante de pago
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button 
-                    onClick={() => onNavigate('pagos')} 
+                  <Button
+                    onClick={() => setActiveTab('vouchers')}
                     className="w-full bg-green-600 hover:bg-green-700 text-white transition-all duration-300 hover:shadow-lg"
                   >
-                    Ir a Pagos
+                    Subir Comprobante
                   </Button>
                 </CardContent>
               </Card>
@@ -243,8 +251,8 @@ export const ClientDashboard = ({ user, onNavigate }: ClientDashboardProps) => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button 
-                    onClick={() => document.querySelector('[data-state="active"][value="payments"]')?.click()}
+                  <Button
+                    onClick={() => setActiveTab('payments')}
                     className="w-full bg-green-600 hover:bg-green-700 text-white transition-all duration-300 hover:shadow-lg"
                   >
                     Ver Historial
@@ -259,15 +267,35 @@ export const ClientDashboard = ({ user, onNavigate }: ClientDashboardProps) => {
                     <span>Certificados</span>
                   </CardTitle>
                   <CardDescription>
-                    Genere y descargue certificados de pago
+                    Genere certificados de pago
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button 
-                    onClick={() => onNavigate('certificados')} 
+                  <Button
+                    onClick={() => onNavigate('certificados')}
                     className="w-full bg-green-600 hover:bg-green-700 text-white transition-all duration-300 hover:shadow-lg"
                   >
                     Generar Certificados
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 hover:-translate-y-1 border-green-100 animate-bounce-in" style={{ animationDelay: '1.1s' }}>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <CreditCard className="h-5 w-5 text-green-600" />
+                    <span>Mis Créditos</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Vea el detalle de sus créditos
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    onClick={() => setActiveTab('credits')}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white transition-all duration-300 hover:shadow-lg"
+                  >
+                    Ver Créditos
                   </Button>
                 </CardContent>
               </Card>
@@ -326,6 +354,28 @@ export const ClientDashboard = ({ user, onNavigate }: ClientDashboardProps) => {
                   <CreditCard className="h-16 w-16 text-green-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold mb-2">No tiene créditos activos</h3>
                   <p className="text-gray-600">Póngase en contacto con nuestro equipo para solicitar un crédito</p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="vouchers" className="space-y-6">
+            {clientCreditsFromPayments.length > 0 ? (
+              <>
+                <PaymentVoucherUpload
+                  creditId={clientCreditsFromPayments[0].id}
+                  onSuccess={() => {
+                    // Recargar datos si es necesario
+                  }}
+                />
+                <VoucherHistory creditId={clientCreditsFromPayments[0].id} />
+              </>
+            ) : (
+              <Card className="border-green-200">
+                <CardContent className="text-center py-8">
+                  <Upload className="h-16 w-16 text-green-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No tiene créditos activos</h3>
+                  <p className="text-gray-600">Necesita un crédito activo para registrar comprobantes de pago</p>
                 </CardContent>
               </Card>
             )}

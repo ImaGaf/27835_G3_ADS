@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { paymentService } from '@/lib/payments.backend';
 import { useToast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface PaidPayment {
   id: string;
@@ -67,6 +69,25 @@ export const CertificatesView = ({ user }: CertificatesViewProps) => {
     }
   };
 
+  const getPaymentMethodText = (method?: string) => {
+    switch (method) {
+      case 'card': return 'Tarjeta';
+      case 'transfer': return 'Transferencia';
+      case 'cash': return 'Efectivo';
+      case 'check': return 'Cheque';
+      default: return method || 'N/A';
+    }
+  };
+
+  const formatDate = (date?: string) => {
+    if (!date) return '-';
+    return new Date(date).toLocaleDateString('es-EC', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   const generateCertificate = async () => {
     if (selectedPayments.length === 0) {
       toast({
@@ -80,32 +101,124 @@ export const CertificatesView = ({ user }: CertificatesViewProps) => {
     setGenerating(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
       const selected = paidPayments.filter(p => selectedPayments.includes(p.id));
       const total = selected.reduce((sum, p) => sum + p.amount, 0);
-      const lines = [
-        'CERTIFICADO DE PAGO - PagoSeguro',
-        '================================',
-        `Fecha de emisión: ${new Date().toLocaleDateString('es-EC')}`,
-        '',
-        ...selected.map(p =>
-          `- ID: ${p.id}\n  Monto: $${p.amount.toFixed(2)}\n  Fecha: ${p.paidDate ? new Date(p.paidDate).toLocaleDateString('es-EC') : new Date(p.createdAt || '').toLocaleDateString('es-EC')}\n  Método: ${p.paymentMethod || 'N/A'}`
-        ),
-        '',
-        `Total certificado: $${total.toFixed(2)}`
-      ];
 
-      const blob = new Blob([lines.join('\n')], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = `certificado-pagos-${Date.now()}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      const doc = new jsPDF();
+
+      // Header con fondo verde
+      doc.setFillColor(34, 139, 34);
+      doc.rect(0, 0, 210, 40, 'F');
+
+      // Título principal
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(24);
+      doc.text('CERTIFICADO DE PAGO', 105, 20, { align: 'center' });
+
+      doc.setFontSize(14);
+      doc.text('PagoSeguro AGROTAC', 105, 32, { align: 'center' });
+
+      // Información de emisión
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+      doc.text(`Fecha de emisión: ${new Date().toLocaleDateString('es-EC', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}`, 105, 50, { align: 'center' });
+
+      // Número de certificado
+      const certNumber = `CERT-${Date.now().toString().slice(-8)}`;
+      doc.setFontSize(12);
+      doc.text(`Certificado N°: ${certNumber}`, 105, 58, { align: 'center' });
+
+      // Línea divisoria
+      doc.setDrawColor(34, 139, 34);
+      doc.setLineWidth(1);
+      doc.line(20, 65, 190, 65);
+
+      // Texto de certificación
+      doc.setFontSize(11);
+      doc.setTextColor(50, 50, 50);
+      const certText = 'Por medio del presente documento, se certifica que se han registrado los siguientes pagos en el sistema PagoSeguro AGROTAC:';
+      const splitText = doc.splitTextToSize(certText, 170);
+      doc.text(splitText, 20, 75);
+
+      // Tabla de pagos
+      const tableData = selected.map(p => [
+        p.id.substring(0, 8) + '...',
+        formatDate(p.paidDate || p.createdAt),
+        `$${p.amount.toFixed(2)}`,
+        getPaymentMethodText(p.paymentMethod),
+        p.creditId.substring(0, 8) + '...'
+      ]);
+
+      autoTable(doc, {
+        startY: 90,
+        head: [['ID Transacción', 'Fecha de Pago', 'Monto', 'Método', 'ID Crédito']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: {
+          fillColor: [34, 139, 34],
+          textColor: 255,
+          fontSize: 10,
+          fontStyle: 'bold'
+        },
+        bodyStyles: {
+          fontSize: 9,
+          textColor: [50, 50, 50]
+        },
+        alternateRowStyles: {
+          fillColor: [240, 255, 240]
+        },
+        columnStyles: {
+          0: { cellWidth: 35 },
+          1: { cellWidth: 40 },
+          2: { cellWidth: 30, halign: 'right' },
+          3: { cellWidth: 35 },
+          4: { cellWidth: 35 }
+        }
+      });
+
+      // Total
+      const finalY = (doc as any).lastAutoTable.finalY + 10;
+      doc.setFillColor(34, 139, 34);
+      doc.rect(120, finalY - 5, 70, 15, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`TOTAL: $${total.toFixed(2)}`, 155, finalY + 5, { align: 'center' });
+
+      // Disclaimer
+      doc.setTextColor(100, 100, 100);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      const disclaimer = 'Este certificado es generado automáticamente por el sistema PagoSeguro AGROTAC y tiene validez como comprobante de pago. Para cualquier consulta, comuníquese con nuestro equipo de soporte.';
+      const splitDisclaimer = doc.splitTextToSize(disclaimer, 170);
+      doc.text(splitDisclaimer, 20, finalY + 25);
+
+      // Firma digital simulada
+      doc.setDrawColor(34, 139, 34);
+      doc.setLineWidth(0.5);
+      doc.line(130, finalY + 50, 190, finalY + 50);
+      doc.setFontSize(10);
+      doc.setTextColor(50, 50, 50);
+      doc.text('Firma Digital Autorizada', 160, finalY + 57, { align: 'center' });
+      doc.setFontSize(8);
+      doc.text('PagoSeguro AGROTAC', 160, finalY + 63, { align: 'center' });
+
+      // Footer
+      doc.setFillColor(34, 139, 34);
+      doc.rect(0, 280, 210, 17, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(8);
+      doc.text('PagoSeguro AGROTAC - Sistema de Gestión de Pagos y Créditos', 105, 288, { align: 'center' });
+      doc.text('www.pagoseguro-agrotac.com | soporte@pagoseguro-agrotac.com', 105, 293, { align: 'center' });
+
+      // Guardar PDF
+      doc.save(`certificado-pagos-${certNumber}.pdf`);
 
       toast({
         title: "Certificado generado",
@@ -113,7 +226,8 @@ export const CertificatesView = ({ user }: CertificatesViewProps) => {
       });
 
       setSelectedPayments([]);
-    } catch {
+    } catch (error) {
+      console.error('Error generating certificate:', error);
       toast({
         title: "Error al generar certificado",
         description: "No se pudo generar el certificado. Intente nuevamente.",
