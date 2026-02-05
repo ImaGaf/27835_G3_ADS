@@ -32,6 +32,7 @@ export const ClientDashboard = ({ user, onNavigate }: ClientDashboardProps) => {
   const [credits, setCredits] = useState<any[]>([]);
   const [pendingPayments, setPendingPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   useEffect(() => {
     const loadClientData = async () => {
@@ -100,7 +101,7 @@ export const ClientDashboard = ({ user, onNavigate }: ClientDashboardProps) => {
         </div>
 
         {/* Pestañas principales */}
-        <Tabs defaultValue="dashboard" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-green-50 border border-green-200">
             <TabsTrigger value="dashboard" className="flex items-center gap-2 data-[state=active]:bg-green-600 data-[state=active]:text-white">
               <TrendingUp className="h-4 w-4" />
@@ -243,8 +244,8 @@ export const ClientDashboard = ({ user, onNavigate }: ClientDashboardProps) => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button 
-                    onClick={() => document.querySelector('[data-state="active"][value="payments"]')?.click()}
+                  <Button
+                    onClick={() => setActiveTab('payments')}
                     className="w-full bg-green-600 hover:bg-green-700 text-white transition-all duration-300 hover:shadow-lg"
                   >
                     Ver Historial

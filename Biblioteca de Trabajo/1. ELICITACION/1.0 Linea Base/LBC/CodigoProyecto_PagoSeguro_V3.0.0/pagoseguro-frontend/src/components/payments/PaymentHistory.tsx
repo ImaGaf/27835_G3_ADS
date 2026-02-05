@@ -7,6 +7,8 @@ import { Calendar, CreditCard, DollarSign, FileText, Download, Building2, Bankno
 import { paymentService } from '@/lib/payments.backend';
 import { creditService } from '@/lib/credits.backend';
 import { useToast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export const PaymentHistory = () => {
   const [filterStatus, setFilterStatus] = useState<'all' | 'paid' | 'late' | 'pending'>('all');
@@ -96,6 +98,210 @@ export const PaymentHistory = () => {
         return <span className="flex items-center gap-1"><FileText className="h-4 w-4 text-green-600" /> Cheque</span>;
       default:
         return <span>{method}</span>;
+    }
+  };
+
+  const getPaymentMethodText = (method: string) => {
+    switch (method) {
+      case 'transfer': return 'Transferencia';
+      case 'cash': return 'Efectivo';
+      case 'check': return 'Cheque';
+      default: return method || 'N/A';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'paid': return 'Pagado';
+      case 'late': return 'Atrasado';
+      case 'pending': return 'Pendiente';
+      default: return status;
+    }
+  };
+
+  const exportToPDF = () => {
+    try {
+      const doc = new jsPDF();
+
+      // Header
+      doc.setFontSize(20);
+      doc.setTextColor(34, 139, 34);
+      doc.text('PagoSeguro AGROTAC', 105, 20, { align: 'center' });
+
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 0);
+      doc.text('Historial de Pagos', 105, 30, { align: 'center' });
+
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-EC')}`, 105, 38, { align: 'center' });
+
+      // Table data
+      const tableData = filteredPayments.map(payment => [
+        formatDate(payment.paidDate || payment.createdAt),
+        payment.creditId,
+        formatCurrency(payment.amount),
+        getPaymentMethodText(payment.paymentMethod),
+        getStatusText(payment.status),
+        payment.description || '-'
+      ]);
+
+      autoTable(doc, {
+        startY: 45,
+        head: [['Fecha', 'Crédito', 'Monto', 'Método', 'Estado', 'Descripción']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: {
+          fillColor: [34, 139, 34],
+          textColor: 255,
+          fontSize: 10
+        },
+        bodyStyles: {
+          fontSize: 9
+        },
+        alternateRowStyles: {
+          fillColor: [240, 255, 240]
+        }
+      });
+
+      // Footer with totals
+      const totalPaid = payments.filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0);
+      const totalPending = payments.filter(p => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0);
+
+      const finalY = (doc as any).lastAutoTable.finalY + 10;
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`Total Pagado: ${formatCurrency(totalPaid)}`, 14, finalY);
+      doc.text(`Total Pendiente: ${formatCurrency(totalPending)}`, 14, finalY + 6);
+
+      doc.save(`historial-pagos-${Date.now()}.pdf`);
+
+      toast({
+        title: "PDF Exportado",
+        description: "El historial de pagos se ha descargado correctamente.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo generar el PDF. Intente nuevamente.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const generateAccountStatement = () => {
+    try {
+      const doc = new jsPDF();
+
+      // Header
+      doc.setFontSize(20);
+      doc.setTextColor(34, 139, 34);
+      doc.text('PagoSeguro AGROTAC', 105, 20, { align: 'center' });
+
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 0);
+      doc.text('Estado de Cuenta', 105, 30, { align: 'center' });
+
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Fecha de emisión: ${new Date().toLocaleDateString('es-EC')}`, 105, 38, { align: 'center' });
+
+      let yPos = 50;
+
+      // Credit summary for each credit
+      credits.forEach((credit, index) => {
+        if (yPos > 250) {
+          doc.addPage();
+          yPos = 20;
+        }
+
+        doc.setFontSize(12);
+        doc.setTextColor(34, 139, 34);
+        doc.text(`Crédito #${credit.id}`, 14, yPos);
+        yPos += 8;
+
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`Descripción: ${credit.description || 'N/A'}`, 14, yPos);
+        yPos += 6;
+        doc.text(`Monto Original: ${formatCurrency(credit.amount)}`, 14, yPos);
+        yPos += 6;
+        doc.text(`Saldo Pendiente: ${formatCurrency(credit.remainingBalance)}`, 14, yPos);
+        yPos += 6;
+        doc.text(`Cuota Mensual: ${formatCurrency(credit.monthlyPayment)}`, 14, yPos);
+        yPos += 6;
+        doc.text(`Tasa de Interés: ${credit.interestRate}% anual`, 14, yPos);
+        yPos += 6;
+        doc.text(`Estado: ${credit.status === 'active' ? 'Activo' : 'Completado'}`, 14, yPos);
+        yPos += 10;
+
+        // Payments for this credit
+        const creditPayments = payments.filter(p => p.creditId === credit.id);
+        if (creditPayments.length > 0) {
+          const tableData = creditPayments.map(p => [
+            formatDate(p.paidDate || p.createdAt),
+            formatCurrency(p.amount),
+            getPaymentMethodText(p.paymentMethod),
+            getStatusText(p.status)
+          ]);
+
+          autoTable(doc, {
+            startY: yPos,
+            head: [['Fecha', 'Monto', 'Método', 'Estado']],
+            body: tableData,
+            theme: 'grid',
+            headStyles: {
+              fillColor: [34, 139, 34],
+              textColor: 255,
+              fontSize: 9
+            },
+            bodyStyles: { fontSize: 8 },
+            margin: { left: 14 }
+          });
+
+          yPos = (doc as any).lastAutoTable.finalY + 15;
+        }
+      });
+
+      // Summary
+      const totalPaid = payments.filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0);
+      const totalPending = payments.filter(p => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0);
+      const totalDebt = credits.reduce((sum, c) => sum + c.remainingBalance, 0);
+
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+
+      doc.setDrawColor(34, 139, 34);
+      doc.setLineWidth(0.5);
+      doc.line(14, yPos, 196, yPos);
+      yPos += 8;
+
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      doc.text('Resumen General', 14, yPos);
+      yPos += 8;
+
+      doc.setFontSize(10);
+      doc.text(`Total Pagado: ${formatCurrency(totalPaid)}`, 14, yPos);
+      yPos += 6;
+      doc.text(`Total Pendiente: ${formatCurrency(totalPending)}`, 14, yPos);
+      yPos += 6;
+      doc.text(`Deuda Total: ${formatCurrency(totalDebt)}`, 14, yPos);
+
+      doc.save(`estado-cuenta-${Date.now()}.pdf`);
+
+      toast({
+        title: "Estado de Cuenta Generado",
+        description: "El estado de cuenta se ha descargado correctamente.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo generar el estado de cuenta. Intente nuevamente.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -255,11 +461,20 @@ export const PaymentHistory = () => {
 
       {/* Botones de Acción */}
       <div className="flex gap-4 justify-end animate-slide-in animation-delay-600">
-        <Button variant="outline" className="flex items-center gap-2 border-green-200 text-green-700 hover:bg-green-50" onClick={() => toast({ title: "Exportar PDF", description: "Esta funcionalidad está en desarrollo", variant: "default" })}>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2 border-green-200 text-green-700 hover:bg-green-50"
+          onClick={exportToPDF}
+          disabled={filteredPayments.length === 0}
+        >
           <Download className="h-4 w-4" />
           Exportar PDF
         </Button>
-        <Button className="flex items-center gap-2 bg-green-600 hover:bg-green-700" onClick={() => toast({ title: "Estado de Cuenta", description: "Esta funcionalidad está en desarrollo", variant: "default" })}>
+        <Button
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+          onClick={generateAccountStatement}
+          disabled={credits.length === 0}
+        >
           <FileText className="h-4 w-4" />
           Solicitar Estado de Cuenta
         </Button>
