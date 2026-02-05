@@ -2,12 +2,28 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1';
 
 export const authService = {
   registerClient: async (userData) => {
-    const res = await fetch(`${API_URL}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData)
-    });
-    return await res.json();
+    try {
+      const res = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return {
+          success: false,
+          message: data.message || 'Error al registrar',
+          errors: data.errors || []
+        };
+      }
+      return data;
+    } catch (error) {
+      console.error('Error en registro:', error);
+      return {
+        success: false,
+        message: 'Error de conexión con el servidor'
+      };
+    }
   },
 
   login: async (email, password) => {
@@ -17,7 +33,7 @@ export const authService = {
       body: JSON.stringify({ email, password })
     });
     const data = await res.json();
-    if (data?.user && data.user.role) {
+    if (data?.user?.role) {
       data.user.role = data.user.role.toLowerCase();
     }
     return data;
@@ -28,7 +44,7 @@ export const authService = {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await res.json();
-    if (data?.user && data.user.role) {
+    if (data?.user?.role) {
       data.user.role = data.user.role.toLowerCase();
     }
     return data;
