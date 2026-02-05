@@ -12,7 +12,8 @@ Este directorio contiene las versiones del Perfil de Proyecto para el sistema Pa
 
 | Archivo                   | Fecha      | Responsable     | Aprobado por  |
 | ------------------------- | ---------- | --------------- | ------------- |
-| G3_Perfil-Proyecto_V5.pdf | 09/02/2026 | Zaith Mandangón | Tipán Oswaldo |
+| G3_Perfil-Proyecto_V5.pdf | 04/02/2026 | Simoné Medina| Tipán Oswaldo |
+| G3_Perfil-Proyecto_V4.pdf | 09/02/2026 | Zaith Mandangón | Tipán Oswaldo |
 | G3 Propuestas.pdf         | 09/02/2026 | Zaith Mandangón | Tipán Oswaldo |
 
 **Fecha de inicio:** 11/12/2025
