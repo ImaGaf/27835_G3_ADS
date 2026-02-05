@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertTriangle, FileDown, Search, Users, Download, FileSpreadsheet, Mail, MessageCircle, MapPin, Send } from 'lucide-react';
+import { dashboardService } from '@/lib/dashboard.backend';
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -104,21 +105,21 @@ export const DelinquencyReports = () => {
           return;
         }
 
-        const response = await fetch('/api/v1/dashboard/delinquent-clients', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await dashboardService.getDelinquentClients(token);
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch delinquent clients');
+        if (response.success && response.data) {
+          // Calcular interés para cada cliente (5% del monto por cada 30 días de mora)
+          const dataWithInterest = response.data.map((client: any) => ({
+            ...client,
+            interesCalculado: client.overdueAmount * 0.05 * Math.ceil(client.daysOverdue / 30)
+          }));
+          setDelinquencyData(dataWithInterest);
+        } else {
+          setDelinquencyData([]);
         }
-
-        const data = await response.json();
-        setDelinquencyData(data.data);
       } catch (error) {
         console.error('Error fetching delinquent clients:', error);
+        setDelinquencyData([]);
       }
     };
 

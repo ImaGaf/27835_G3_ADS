@@ -262,8 +262,9 @@ export const CreditManagement = ({ user }: CreditManagementProps) => {
               <SelectContent>
                 <SelectItem value="all">Todos los estados</SelectItem>
                 <SelectItem value="active">Activo</SelectItem>
-                <SelectItem value="completed">Completado</SelectItem>
-                <SelectItem value="defaulted">En mora</SelectItem>
+                <SelectItem value="overdue">En mora</SelectItem>
+                <SelectItem value="paid">Pagado</SelectItem>
+                <SelectItem value="cancelled">Cancelado</SelectItem>
               </SelectContent>
             </Select>
             <Dialog open={isGrantingCredit} onOpenChange={setIsGrantingCredit}>
@@ -393,14 +394,18 @@ export const CreditManagement = ({ user }: CreditManagementProps) => {
                     <TableCell>{credit.paidInstallments}/{credit.term}</TableCell>
                     <TableCell className="font-semibold">${credit.remainingBalance.toFixed(2)}</TableCell>
                     <TableCell>
-                      <Badge 
+                      <Badge
                         variant={
-                          credit.status === 'active' ? 'success' : 
-                          credit.status === 'completed' ? 'secondary' : 'destructive'
+                          credit.status === 'active' ? 'success' :
+                          credit.status === 'paid' ? 'secondary' :
+                          credit.status === 'overdue' ? 'destructive' :
+                          'outline'
                         }
                       >
-                        {credit.status === 'active' ? 'Activo' : 
-                         credit.status === 'completed' ? 'Completado' : 'En mora'}
+                        {credit.status === 'active' ? 'Activo' :
+                         credit.status === 'paid' ? 'Pagado' :
+                         credit.status === 'overdue' ? 'En mora' :
+                         credit.status === 'cancelled' ? 'Cancelado' : credit.status}
                       </Badge>
                     </TableCell>
                     <TableCell>{credit.createdDate}</TableCell>

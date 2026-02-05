@@ -6,9 +6,21 @@ export class DashboardController {
 
   async getManagerMetrics(_: Request, res: Response) {
     try {
-      const metrics = await this.dashboardService.getManagerMetrics();
-      res.json({ success: true, metrics });
+      // Obtener todas las métricas necesarias en paralelo
+      const [statistics, monthlyData, creditDistribution] = await Promise.all([
+        this.dashboardService.getManagerMetrics(),
+        this.dashboardService.getMonthlyData(),
+        this.dashboardService.getCreditDistribution(),
+      ]);
+
+      res.json({
+        success: true,
+        statistics,
+        monthlyData,
+        creditDistribution,
+      });
     } catch (error) {
+      console.error('Error fetching manager metrics:', error);
       res.status(500).json({ success: false, message: 'Error fetching manager metrics', error });
     }
   }
@@ -83,6 +95,34 @@ export class DashboardController {
       return res.status(500).json({
         success: false,
         message: 'Failed to fetch delinquent clients',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+
+  async getAuditLogs(_: Request, res: Response) {
+    try {
+      const auditLogs = await this.dashboardService.getAuditLogs();
+      return res.status(200).json({ success: true, data: auditLogs });
+    } catch (error) {
+      console.error('Error fetching audit logs:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to fetch audit logs',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+
+  async getPaymentsReport(_: Request, res: Response) {
+    try {
+      const payments = await this.dashboardService.getPaymentsReport();
+      return res.status(200).json({ success: true, data: payments });
+    } catch (error) {
+      console.error('Error fetching payments report:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to fetch payments report',
         error: error instanceof Error ? error.message : 'Unknown error',
       });
     }

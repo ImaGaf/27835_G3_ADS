@@ -12,5 +12,7 @@ export function createDashboardRoutes(dashboardController: DashboardController, 
   router.get('/alerts', authMiddleware.authenticate(), (req, res) => dashboardController.getAlerts(req, res));
   router.get('/clients', authMiddleware.authenticate(), (req, res) => dashboardController.getClients(req, res));
   router.get('/delinquent-clients', authMiddleware.authenticate(), (req, res) => dashboardController.getDelinquentClients(req, res));
+  router.get('/audit-logs', authMiddleware.authenticate(), (req, res) => dashboardController.getAuditLogs(req, res));
+  router.get('/payments-report', authMiddleware.authenticate(), (req, res) => dashboardController.getPaymentsReport(req, res));
   return router;
 }

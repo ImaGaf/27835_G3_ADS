@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Users, 
-  AlertTriangle, 
+import {
+  Users,
+  AlertTriangle,
   FileText,
   Search,
   Clock,
@@ -18,7 +18,8 @@ import {
   Target,
   DollarSign,
   TrendingUp,
-  MapPin
+  MapPin,
+  CheckCircle
 } from 'lucide-react';
 import { dashboardService } from '@/lib/dashboard.backend';
 
@@ -73,8 +74,9 @@ export const AssistantDashboard = ({ user, onNavigate }: AssistantDashboardProps
       }
 
       try {
-        const [metricsRes, monthlyDataRes, creditDistributionRes] = await Promise.all([
+        const [metricsRes, managerMetricsRes, monthlyDataRes, creditDistributionRes] = await Promise.all([
           dashboardService.getAssistantMetrics(token),
+          dashboardService.getManagerMetrics(token),
           dashboardService.getMonthlyData(token),
           dashboardService.getCreditDistribution(token)
         ]);
@@ -83,6 +85,11 @@ export const AssistantDashboard = ({ user, onNavigate }: AssistantDashboardProps
           setStats(metricsRes.metrics);
         } else {
           setStats({ overduePayments: 0, pendingContacts: 0, reportsGenerated: 0, clientsToday: 0 });
+        }
+
+        // Cargar estadísticas del manager para las analíticas
+        if (managerMetricsRes.success && managerMetricsRes.statistics) {
+          setStatistics(managerMetricsRes.statistics);
         }
 
         if (monthlyDataRes.success && monthlyDataRes.data) {
@@ -142,6 +149,11 @@ export const AssistantDashboard = ({ user, onNavigate }: AssistantDashboardProps
 
     loadTasksAndAlerts();
   }, []);
+
+  // Función para quitar/marcar como hecha una tarea
+  const handleRemoveTask = (taskId: number) => {
+    setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+  };
 
   // Render fallback messages for empty data
   const renderStat = (value, label, color) => (
@@ -291,26 +303,43 @@ export const AssistantDashboard = ({ user, onNavigate }: AssistantDashboardProps
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {tasks.map((task, index) => (
-                    <div
-                      key={task.id}
-                      className="flex flex-col p-3 border border-green-200 rounded-lg hover:bg-green-50 transition-colors duration-200 animate-slide-in-left"
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      <div className="flex items-center space-x-3 mb-2">
-                        <Clock className="h-4 w-4 text-green-600" />
-                        <div>
-                          <p className="font-medium">{task.title}</p>
-                          <p className="text-sm text-gray-600">{task.description}</p>
-                        </div>
-                        <Badge className={`ml-auto ${task.priority === 'Urgente' ? 'bg-red-100 text-red-800 border-red-200' : 'bg-green-100 text-green-800 border-green-200'}`}>{task.priority}</Badge>
-                      </div>
-                      <div className="pl-7 text-sm text-gray-700">
-                        <p className="flex items-center gap-1"><Phone className="h-3 w-3 text-green-600" /> <strong>Teléfono:</strong> {task.phone}</p>
-                        <p className="flex items-center gap-1"><MapPin className="h-3 w-3 text-green-600" /> <strong>Dirección:</strong> {task.address}</p>
-                      </div>
+                  {tasks.length === 0 ? (
+                    <div className="text-center py-4 text-gray-500">
+                      No hay tareas pendientes
                     </div>
-                  ))}
+                  ) : (
+                    tasks.map((task, index) => (
+                      <div
+                        key={task.id}
+                        className="flex flex-col p-3 border border-green-200 rounded-lg hover:bg-green-50 transition-colors duration-200 animate-slide-in-left"
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
+                        <div className="flex items-center space-x-3 mb-2">
+                          <Clock className="h-4 w-4 text-green-600" />
+                          <div className="flex-1">
+                            <p className="font-medium">{task.title}</p>
+                            <p className="text-sm text-gray-600">{task.description}</p>
+                          </div>
+                          <Badge className={`${task.priority === 'Urgente' ? 'bg-red-100 text-red-800 border-red-200' : 'bg-green-100 text-green-800 border-green-200'}`}>{task.priority}</Badge>
+                        </div>
+                        <div className="pl-7 text-sm text-gray-700">
+                          <p className="flex items-center gap-1"><Phone className="h-3 w-3 text-green-600" /> <strong>Teléfono:</strong> {task.phone}</p>
+                          <p className="flex items-center gap-1"><MapPin className="h-3 w-3 text-green-600" /> <strong>Dirección:</strong> {task.address}</p>
+                        </div>
+                        <div className="flex justify-end mt-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleRemoveTask(task.id)}
+                            className="text-green-700 border-green-300 hover:bg-green-100 hover:text-green-800"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Quitar tarea
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>

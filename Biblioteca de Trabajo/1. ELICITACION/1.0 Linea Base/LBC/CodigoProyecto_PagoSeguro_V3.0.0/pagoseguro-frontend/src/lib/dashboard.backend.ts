@@ -37,5 +37,29 @@ export const dashboardService = {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     return await res.json();
+  },
+  getAuditLogs: async (token) => {
+    const res = await fetch(`${API_URL}/dashboard/audit-logs`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return await res.json();
+  },
+  getPaymentsReport: async (token) => {
+    const res = await fetch(`${API_URL}/dashboard/payments-report`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return await res.json();
+  },
+  getClients: async (token) => {
+    const res = await fetch(`${API_URL}/dashboard/clients`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return await res.json();
+  },
+  getDelinquentClients: async (token) => {
+    const res = await fetch(`${API_URL}/dashboard/delinquent-clients`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return await res.json();
   }
 };

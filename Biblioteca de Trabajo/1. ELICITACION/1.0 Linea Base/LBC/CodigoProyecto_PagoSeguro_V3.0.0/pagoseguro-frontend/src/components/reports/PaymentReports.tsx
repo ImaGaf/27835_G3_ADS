@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Search, FileDown, CalendarIcon, Filter, TrendingUp, Download, FileSpreadsheet, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { dashboardService } from '@/lib/dashboard.backend';
 
 interface User {
   id: string;
@@ -52,129 +53,8 @@ interface PaymentReport {
 }
 
 export const PaymentReports = ({ user }: PaymentReportsProps) => {
-  // Datos predeterminados de clientes
-  const predeterminedClients: Client[] = [
-    {
-      id: '1',
-      name: 'María González',
-      cedula: '1234567890',
-      plazoMeses: 12,
-      interesMora: 2.5
-    },
-    {
-      id: '2',
-      name: 'Carlos Rodríguez',
-      cedula: '0987654321',
-      plazoMeses: 24,
-      interesMora: 3.0
-    },
-    {
-      id: '3',
-      name: 'Ana Martínez',
-      cedula: '1122334455',
-      plazoMeses: 6,
-      interesMora: 2.0
-    },
-    {
-      id: '4',
-      name: 'Luis Pérez',
-      cedula: '5566778899',
-      plazoMeses: 18,
-      interesMora: 2.8
-    },
-    {
-      id: '5',
-      name: 'Carmen López',
-      cedula: '9988776655',
-      plazoMeses: 36,
-      interesMora: 3.5
-    }
-  ];
-
-  // Datos predeterminados de pagos
-  const predeterminedPayments: Payment[] = [
-    {
-      id: 'pay001',
-      clientId: '1',
-      date: '2024-07-15',
-      amount: 500.00,
-      method: 'tarjeta',
-      status: 'paid'
-    },
-    {
-      id: 'pay002',
-      clientId: '1',
-      date: '2024-06-15',
-      amount: 500.00,
-      method: 'transferencia',
-      status: 'paid'
-    },
-    {
-      id: 'pay003',
-      clientId: '2',
-      date: '2024-07-20',
-      amount: 750.00,
-      method: 'efectivo',
-      status: 'pending'
-    },
-    {
-      id: 'pay004',
-      clientId: '2',
-      date: '2024-05-20',
-      amount: 750.00,
-      method: 'tarjeta',
-      status: 'overdue'
-    },
-    {
-      id: 'pay005',
-      clientId: '3',
-      date: '2024-07-25',
-      amount: 300.00,
-      method: 'transferencia',
-      status: 'paid'
-    },
-    {
-      id: 'pay006',
-      clientId: '3',
-      date: '2024-06-25',
-      amount: 300.00,
-      method: 'tarjeta',
-      status: 'paid'
-    },
-    {
-      id: 'pay007',
-      clientId: '4',
-      date: '2024-07-10',
-      amount: 850.00,
-      method: 'efectivo',
-      status: 'pending'
-    },
-    {
-      id: 'pay008',
-      clientId: '4',
-      date: '2024-06-10',
-      amount: 850.00,
-      method: 'transferencia',
-      status: 'paid'
-    },
-    {
-      id: 'pay009',
-      clientId: '5',
-      date: '2024-07-05',
-      amount: 1200.00,
-      method: 'tarjeta',
-      status: 'paid'
-    },
-    {
-      id: 'pay010',
-      clientId: '5',
-      date: '2024-04-05',
-      amount: 1200.00,
-      method: 'efectivo',
-      status: 'overdue'
-    }
-  ];
-
+  const [clients, setClients] = useState<Client[]>([]);
+  const [allPayments, setAllPayments] = useState<PaymentReport[]>([]);
   const [reportType, setReportType] = useState<'client' | 'dateRange' | 'allClients'>('client');
   const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState<Date>();
@@ -184,6 +64,46 @@ export const PaymentReports = ({ user }: PaymentReportsProps) => {
   const [reportData, setReportData] = useState<PaymentReport[]>([]);
   const [filteredData, setFilteredData] = useState<PaymentReport[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Cargar datos reales del backend al montar el componente
+  useEffect(() => {
+    const loadData = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const [paymentsRes, clientsRes] = await Promise.all([
+          dashboardService.getPaymentsReport(token),
+          dashboardService.getClients(token),
+        ]);
+
+        if (paymentsRes.success && paymentsRes.data) {
+          setAllPayments(paymentsRes.data);
+        }
+
+        if (clientsRes.success && clientsRes.data) {
+          const formattedClients = clientsRes.data.map((c: any) => ({
+            id: c.id,
+            name: c.name,
+            cedula: c.cedula || '',
+            plazoMeses: 12,
+            interesMora: 2.5,
+          }));
+          setClients(formattedClients);
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   useEffect(() => {
     filterData();
@@ -197,7 +117,7 @@ export const PaymentReports = ({ user }: PaymentReportsProps) => {
 
     setIsGenerating(true);
     
-    const client = predeterminedClients.find(c => 
+    const client = clients.find(c =>
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.cedula.includes(searchTerm)
     );
@@ -211,19 +131,19 @@ export const PaymentReports = ({ user }: PaymentReportsProps) => {
       return;
     }
 
-    const clientPayments = predeterminedPayments
+    const clientPayments = allPayments
       .filter(p => p.clientId === client.id)
       .map(payment => ({
         id: payment.id,
-        invoiceNumber: `INV-${payment.id.slice(-3).toUpperCase()}`,
+        invoiceNumber: payment.invoiceNumber || `INV-${String(payment.id).slice(-3).toUpperCase()}`,
         clientName: client.name,
         clientId: client.id,
         date: payment.date,
         amount: payment.amount,
         method: payment.method,
         status: payment.status,
-        plazoMeses: client.plazoMeses,
-        interesMora: client.interesMora
+        plazoMeses: payment.plazoMeses || client.plazoMeses,
+        interesMora: payment.interesMora || client.interesMora
       }))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
@@ -251,24 +171,30 @@ export const PaymentReports = ({ user }: PaymentReportsProps) => {
 
     setIsGenerating(true);
 
-    const dateRangePayments = predeterminedPayments
+    // Ajustar fechas para incluir todo el día
+    const startOfDay = new Date(startDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(endDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const dateRangePayments = allPayments
       .filter(payment => {
         const paymentDate = new Date(payment.date);
-        return paymentDate >= startDate && paymentDate <= endDate;
+        return paymentDate >= startOfDay && paymentDate <= endOfDay;
       })
       .map(payment => {
-        const client = predeterminedClients.find(c => c.id === payment.clientId);
+        const client = clients.find(c => c.id === payment.clientId);
         return {
           id: payment.id,
-          invoiceNumber: `INV-${payment.id.slice(-3).toUpperCase()}`,
-          clientName: client?.name || 'Cliente no encontrado',
+          invoiceNumber: payment.invoiceNumber || `INV-${String(payment.id).slice(-3).toUpperCase()}`,
+          clientName: payment.clientName || client?.name || 'Cliente no encontrado',
           clientId: payment.clientId,
           date: payment.date,
           amount: payment.amount,
           method: payment.method,
           status: payment.status,
-          plazoMeses: client?.plazoMeses,
-          interesMora: client?.interesMora
+          plazoMeses: payment.plazoMeses || client?.plazoMeses,
+          interesMora: payment.interesMora || client?.interesMora
         };
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -285,26 +211,26 @@ export const PaymentReports = ({ user }: PaymentReportsProps) => {
   const generateAllClientsReport = () => {
     setIsGenerating(true);
 
-    const allPayments = predeterminedPayments
+    const allPaymentsData = allPayments
       .map(payment => {
-        const client = predeterminedClients.find(c => c.id === payment.clientId);
+        const client = clients.find(c => c.id === payment.clientId);
         return {
           id: payment.id,
-          invoiceNumber: `INV-${payment.id.slice(-3).toUpperCase()}`,
-          clientName: client?.name || 'Cliente no encontrado',
+          invoiceNumber: payment.invoiceNumber || `INV-${String(payment.id).slice(-3).toUpperCase()}`,
+          clientName: payment.clientName || client?.name || 'Cliente no encontrado',
           clientId: payment.clientId,
           date: payment.date,
           amount: payment.amount,
           method: payment.method,
           status: payment.status,
-          plazoMeses: client?.plazoMeses,
-          interesMora: client?.interesMora
+          plazoMeses: payment.plazoMeses || client?.plazoMeses,
+          interesMora: payment.interesMora || client?.interesMora
         };
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     setTimeout(() => {
-      setReportData(allPayments);
+      setReportData(allPaymentsData);
       setIsGenerating(false);
     }, 800);
   };
@@ -313,11 +239,46 @@ export const PaymentReports = ({ user }: PaymentReportsProps) => {
     let filtered = reportData;
 
     if (methodFilter !== 'all') {
-      filtered = filtered.filter(payment => payment.method === methodFilter);
+      filtered = filtered.filter(payment => {
+        const method = payment.method?.toLowerCase() || '';
+        if (methodFilter === 'transferencia') {
+          return method.includes('transferencia') || method.includes('pse');
+        }
+        if (methodFilter === 'efectivo') {
+          return method.includes('efectivo') || method.includes('cash');
+        }
+        if (methodFilter === 'tarjeta') {
+          return method.includes('tarjeta') || method.includes('card') || method.includes('credito') || method.includes('debito');
+        }
+        return method.includes(methodFilter);
+      });
     }
 
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(payment => payment.status === statusFilter);
+      filtered = filtered.filter(payment => {
+        const status = payment.status?.toLowerCase() || '';
+        if (statusFilter === 'overdue') {
+          // Considerar como vencido: pagos pendientes con fecha > 30 días
+          if (status === 'pending') {
+            const paymentDate = new Date(payment.date);
+            const today = new Date();
+            const diffDays = Math.floor((today.getTime() - paymentDate.getTime()) / (1000 * 60 * 60 * 24));
+            return diffDays > 30;
+          }
+          return status === 'overdue';
+        }
+        if (statusFilter === 'pending') {
+          // Solo pendientes recientes (menos de 30 días)
+          if (status === 'pending') {
+            const paymentDate = new Date(payment.date);
+            const today = new Date();
+            const diffDays = Math.floor((today.getTime() - paymentDate.getTime()) / (1000 * 60 * 60 * 24));
+            return diffDays <= 30;
+          }
+          return false;
+        }
+        return status === statusFilter;
+      });
     }
 
     setFilteredData(filtered);
@@ -774,9 +735,26 @@ export const PaymentReports = ({ user }: PaymentReportsProps) => {
   };
 
   const getStatusStats = () => {
-    const paid = filteredData.filter(p => p.status === 'paid').length;
-    const pending = filteredData.filter(p => p.status === 'pending').length;
-    const overdue = filteredData.filter(p => p.status === 'overdue').length;
+    const paid = filteredData.filter(p => p.status?.toLowerCase() === 'paid').length;
+    let pending = 0;
+    let overdue = 0;
+
+    filteredData.forEach(p => {
+      const status = p.status?.toLowerCase() || '';
+      if (status === 'pending') {
+        const paymentDate = new Date(p.date);
+        const today = new Date();
+        const diffDays = Math.floor((today.getTime() - paymentDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (diffDays > 30) {
+          overdue++;
+        } else {
+          pending++;
+        }
+      } else if (status === 'overdue') {
+        overdue++;
+      }
+    });
+
     return { paid, pending, overdue };
   };
 
@@ -796,16 +774,22 @@ export const PaymentReports = ({ user }: PaymentReportsProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {predeterminedClients.map((client) => (
-              <div key={client.id} className="p-3 border rounded-lg">
-                <div className="font-medium">{client.name}</div>
-                <div className="text-sm text-muted-foreground">Cédula: {client.cedula}</div>
-                <div className="text-sm text-muted-foreground">Plazo: {client.plazoMeses} meses</div>
-                <div className="text-sm text-muted-foreground">Interés: {client.interesMora}%</div>
-              </div>
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="text-center py-4 text-muted-foreground">Cargando clientes...</div>
+          ) : clients.length === 0 ? (
+            <div className="text-center py-4 text-muted-foreground">No hay clientes disponibles</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {clients.map((client) => (
+                <div key={client.id} className="p-3 border rounded-lg">
+                  <div className="font-medium">{client.name}</div>
+                  <div className="text-sm text-muted-foreground">Cédula: {client.cedula}</div>
+                  <div className="text-sm text-muted-foreground">Plazo: {client.plazoMeses} meses</div>
+                  <div className="text-sm text-muted-foreground">Interés: {client.interesMora}%</div>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -919,7 +903,7 @@ export const PaymentReports = ({ user }: PaymentReportsProps) => {
                 <h3 className="font-medium text-blue-900 mb-2">Reporte Completo de Todos los Clientes</h3>
                 <p className="text-sm text-blue-700">
                   Este reporte incluirá todos los pagos de todos los clientes registrados en el sistema.
-                  Total de clientes: {predeterminedClients.length}
+                  Total de clientes: {clients.length}
                 </p>
               </div>
               <div className="flex justify-start">
@@ -998,9 +982,9 @@ export const PaymentReports = ({ user }: PaymentReportsProps) => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todos los métodos</SelectItem>
-                      <SelectItem value="tarjeta">Tarjeta</SelectItem>
-                      <SelectItem value="transferencia">Transferencia</SelectItem>
+                      <SelectItem value="transferencia">Transferencia/PSE</SelectItem>
                       <SelectItem value="efectivo">Efectivo</SelectItem>
+                      <SelectItem value="tarjeta">Tarjeta</SelectItem>
                     </SelectContent>
                   </Select>
 
@@ -1063,19 +1047,33 @@ export const PaymentReports = ({ user }: PaymentReportsProps) => {
                         <TableCell>${payment.amount.toFixed(2)}</TableCell>
                         <TableCell className="capitalize">{payment.method}</TableCell>
                         <TableCell>
-                          <Badge 
-                            variant={
-                              payment.status === 'paid' ? 'default' : 
-                              payment.status === 'pending' ? 'outline' : 'destructive'
+                          {(() => {
+                            const status = payment.status?.toLowerCase() || '';
+                            let isOverdue = false;
+                            if (status === 'pending') {
+                              const paymentDate = new Date(payment.date);
+                              const today = new Date();
+                              const diffDays = Math.floor((today.getTime() - paymentDate.getTime()) / (1000 * 60 * 60 * 24));
+                              isOverdue = diffDays > 30;
                             }
-                            className={
-                              payment.status === 'paid' ? 'bg-green-500 hover:bg-green-600' : 
-                              payment.status === 'pending' ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : ''
-                            }
-                          >
-                            {payment.status === 'paid' ? 'Pagado' : 
-                             payment.status === 'pending' ? 'Pendiente' : 'Vencido'}
-                          </Badge>
+                            const displayStatus = status === 'paid' ? 'paid' :
+                                                  status === 'overdue' || isOverdue ? 'overdue' : 'pending';
+                            return (
+                              <Badge
+                                variant={
+                                  displayStatus === 'paid' ? 'default' :
+                                  displayStatus === 'pending' ? 'outline' : 'destructive'
+                                }
+                                className={
+                                  displayStatus === 'paid' ? 'bg-green-500 hover:bg-green-600' :
+                                  displayStatus === 'pending' ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : ''
+                                }
+                              >
+                                {displayStatus === 'paid' ? 'Pagado' :
+                                 displayStatus === 'pending' ? 'Pendiente' : 'Vencido'}
+                              </Badge>
+                            );
+                          })()}
                         </TableCell>
                         <TableCell>{payment.plazoMeses ?? '-'}</TableCell>
                         <TableCell>{payment.interesMora ? `${payment.interesMora.toFixed(2)}%` : '-'}</TableCell>

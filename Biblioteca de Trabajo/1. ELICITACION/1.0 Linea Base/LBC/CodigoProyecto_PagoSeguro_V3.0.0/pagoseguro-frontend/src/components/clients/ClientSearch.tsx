@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Search, User, CreditCard, Calendar } from 'lucide-react';
 import { creditService } from '@/lib/credits.backend';
+import { dashboardService } from '@/lib/dashboard.backend';
 import { User as UserType } from '@/lib/auth';
 
 interface ClientSearchProps {
@@ -121,21 +122,28 @@ export const ClientSearch = ({ user }: ClientSearchProps) => {
           return;
         }
 
-        const response = await fetch(`/api/v1/payments/recent/${selectedClient?.id}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        // Usar el servicio de dashboard para obtener todos los pagos
+        const response = await dashboardService.getPaymentsReport(token);
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch recent payments');
+        if (response.success && response.data) {
+          // Filtrar pagos del cliente seleccionado
+          const clientPayments = response.data
+            .filter((payment: any) => payment.clientId === selectedClient?.id)
+            .map((payment: any, index: number) => ({
+              id: payment.invoiceNumber || `PAY-${String(index + 1).padStart(3, '0')}`,
+              installmentNumber: index + 1,
+              date: payment.date,
+              amount: payment.amount,
+              status: payment.status?.toLowerCase() || 'pending',
+              method: payment.method || 'No especificado'
+            }));
+          setPagosQuemados(clientPayments);
+        } else {
+          setPagosQuemados([]);
         }
-
-        const data = await response.json();
-        setPagosQuemados(data.payments);
       } catch (error) {
         console.error('Error fetching recent payments:', error);
+        setPagosQuemados([]);
       }
     };
 

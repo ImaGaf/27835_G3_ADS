@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Search, FileDown, Calendar as CalendarIcon, Shield, Activity, Users, AlertTriangle, FileSpreadsheet } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { dashboardService } from '@/lib/dashboard.backend';
 
 interface User {
   id: string;
@@ -42,6 +43,7 @@ export const SystemAudit = ({ user }: SystemAuditProps) => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadAuditLogs();
@@ -51,122 +53,26 @@ export const SystemAudit = ({ user }: SystemAuditProps) => {
     filterLogs();
   }, [auditLogs, searchTerm, userFilter, moduleFilter, statusFilter, startDate, endDate]);
 
-  const loadAuditLogs = () => {
-    // Generar datos de auditoría simulados
-    const mockLogs: AuditLog[] = [
-      {
-        id: '1',
-        userId: 'user-1',
-        userName: 'Juan Pérez',
-        action: 'Inicio de sesión',
-        module: 'Autenticación',
-        timestamp: '2024-01-25 08:30:15',
-        ipAddress: '192.168.1.100',
-        details: 'Login exitoso desde navegador Chrome',
-        status: 'success'
-      },
-      {
-        id: '2',
-        userId: 'user-manager',
-        userName: 'Carlos Administrador',
-        action: 'Otorgar crédito',
-        module: 'Gestión de Créditos',
-        timestamp: '2024-01-25 09:15:30',
-        ipAddress: '192.168.1.50',
-        details: 'Crédito de $5000 otorgado a cliente María González',
-        status: 'success'
-      },
-      {
-        id: '3',
-        userId: 'user-assistant',
-        userName: 'Ana Asistente',
-        action: 'Generar reporte',
-        module: 'Reportes',
-        timestamp: '2024-01-25 10:45:20',
-        ipAddress: '192.168.1.75',
-        details: 'Reporte de morosidad generado para enero 2024',
-        status: 'success'
-      },
-      {
-        id: '4',
-        userId: 'user-2',
-        userName: 'Luis Rodríguez',
-        action: 'Intento de pago',
-        module: 'Pagos',
-        timestamp: '2024-01-25 11:20:45',
-        ipAddress: '192.168.1.110',
-        details: 'Pago rechazado - Tarjeta sin fondos',
-        status: 'error'
-      },
-      {
-        id: '5',
-        userId: 'user-manager',
-        userName: 'Carlos Administrador',
-        action: 'Registrar asistente',
-        module: 'Gestión de Usuarios',
-        timestamp: '2024-01-25 12:00:10',
-        ipAddress: '192.168.1.50',
-        details: 'Nuevo asistente registrado: Pedro García',
-        status: 'success'
-      },
-      {
-        id: '6',
-        userId: 'user-3',
-        userName: 'María González',
-        action: 'Realizar pago',
-        module: 'Pagos',
-        timestamp: '2024-01-25 13:15:35',
-        ipAddress: '192.168.1.120',
-        details: 'Pago de cuota mensual $250.00 procesado exitosamente',
-        status: 'success'
-      },
-      {
-        id: '7',
-        userId: 'user-assistant',
-        userName: 'Ana Asistente',
-        action: 'Consultar cliente',
-        module: 'Consulta de Clientes',
-        timestamp: '2024-01-25 14:30:22',
-        ipAddress: '192.168.1.75',
-        details: 'Consulta de información del cliente Roberto Silva',
-        status: 'success'
-      },
-      {
-        id: '8',
-        userId: 'unknown',
-        userName: 'Usuario no identificado',
-        action: 'Intento de acceso',
-        module: 'Autenticación',
-        timestamp: '2024-01-25 15:45:18',
-        ipAddress: '203.154.78.92',
-        details: 'Intento de acceso con credenciales inválidas',
-        status: 'error'
-      },
-      {
-        id: '9',
-        userId: 'user-1',
-        userName: 'Juan Pérez',
-        action: 'Generar certificado',
-        module: 'Certificados',
-        timestamp: '2024-01-25 16:20:55',
-        ipAddress: '192.168.1.100',
-        details: 'Certificado de pago generado para factura INV-2024-001',
-        status: 'success'
-      },
-      {
-        id: '10',
-        userId: 'user-manager',
-        userName: 'Carlos Administrador',
-        action: 'Exportar reporte',
-        module: 'Reportes',
-        timestamp: '2024-01-25 17:10:40',
-        ipAddress: '192.168.1.50',
-        details: 'Reporte de pagos exportado en formato PDF',
-        status: 'success'
-      }
-    ];
+  const loadAuditLogs = async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      setIsLoading(false);
+      return;
+    }
 
-    setAuditLogs(mockLogs);
+    try {
+      const response = await dashboardService.getAuditLogs(token);
+      if (response.success && response.data) {
+        setAuditLogs(response.data);
+      } else {
+        setAuditLogs([]);
+      }
+    } catch (error) {
+      console.error('Error loading audit logs:', error);
+      setAuditLogs([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const filterLogs = () => {
@@ -619,50 +525,56 @@ export const SystemAudit = ({ user }: SystemAuditProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Usuario</TableHead>
-                  <TableHead>Acción</TableHead>
-                  <TableHead>Módulo</TableHead>
-                  <TableHead>Fecha y Hora</TableHead>
-                  <TableHead>IP</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Detalles</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredLogs.map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell className="font-medium">{log.userName}</TableCell>
-                    <TableCell>{log.action}</TableCell>
-                    <TableCell>{log.module}</TableCell>
-                    <TableCell className="text-sm">{log.timestamp}</TableCell>
-                    <TableCell className="text-sm font-mono">{log.ipAddress}</TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={
-                          log.status === 'success' ? 'default' : 
-                          log.status === 'error' ? 'destructive' : 'outline'
-                        }
-                        className={
-                          log.status === 'success' ? 'bg-green-500 hover:bg-green-600' : 
-                          log.status === 'warning' ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : ''
-                        }
-                      >
-                        {log.status === 'success' ? 'Éxito' : 
-                         log.status === 'error' ? 'Error' : 'Advertencia'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="max-w-xs truncate" title={log.details}>
-                      {log.details}
-                    </TableCell>
+          {isLoading ? (
+            <div className="text-center py-8 text-muted-foreground">Cargando registros de auditoría...</div>
+          ) : filteredLogs.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">No hay registros de auditoría disponibles</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Usuario</TableHead>
+                    <TableHead>Acción</TableHead>
+                    <TableHead>Módulo</TableHead>
+                    <TableHead>Fecha y Hora</TableHead>
+                    <TableHead>IP</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Detalles</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {filteredLogs.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell className="font-medium">{log.userName}</TableCell>
+                      <TableCell>{log.action}</TableCell>
+                      <TableCell>{log.module}</TableCell>
+                      <TableCell className="text-sm">{log.timestamp}</TableCell>
+                      <TableCell className="text-sm font-mono">{log.ipAddress}</TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            log.status === 'success' ? 'default' :
+                            log.status === 'error' ? 'destructive' : 'outline'
+                          }
+                          className={
+                            log.status === 'success' ? 'bg-green-500 hover:bg-green-600' :
+                            log.status === 'warning' ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : ''
+                          }
+                        >
+                          {log.status === 'success' ? 'Éxito' :
+                           log.status === 'error' ? 'Error' : 'Advertencia'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="max-w-xs truncate" title={log.details}>
+                        {log.details}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
