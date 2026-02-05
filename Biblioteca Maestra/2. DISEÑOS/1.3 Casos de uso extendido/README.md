@@ -1,0 +1,5 @@
+# 📌 Versiones y Variantes
+
+| Código del ECS | Descripción del ECS                              | Versión/Variante | Fecha de creación | Autor(es)                                                        | Localización                                                                 | Observaciones                                  | Variante de requisitos de usuario | Variante de plataforma |
+| :------------: | :----------------------------------------------- | :--------------: | :---------------: | :--------------------------------------------------------------- | :--------------------------------------------------------------------------- | :--------------------------------------------- | :-------------------------------: | :--------------------: |
+|      CUSO      | Casos de uso extendidos para Pago Seguro AGROTAC |       V1.0       |    05/02/2026     | Fernando Sandoval, Tipán Oswaldo, Simone Medina, Zaith Mandangón | Biblioteca Maestra/2. DISEÑOS/1.3 Casos de uso extendido/G3_Casos_de_uso.pdf | Primera versión de los casos de uso extendidos |              Español              |       Windows 11       |

@@ -1,29 +1,24 @@
 # Especificación de Requisitos de Software (SRS)
 
-Este directorio contiene los documentos que forman parte del Elemento de Configuración del Software (ECS) relacionado con la especificación de requisitos del proyecto PagoSeguro.
+Este directorio contiene los documentos que forman parte del Elemento de Configuración del Software (ECS) relacionado con la especificación de requisitos del proyecto **Pago Seguro AGROTAC**.
 
 ## Información del ECS
 
 - **Código del ECS:** SRS
 - **Nombre del ECS:** Especificación de Requisitos de Software
-- **Autor:** Fernando Sandoval, Tipán Oswaldo, Simone Medina, Zaith Mandangón
-- **Proyecto:** PagoSeguro
+- **Autor:** Oswaldo Tipán, Fernando Sandoval, Zaith Manangón, Simone Medina
+- **Proyecto:** Pago Seguro AGROTAC
 - **Línea base:** LBR - Línea Base Requisitos
-- **Localización:** Biblioteca Maestra/1. ELICITACION/1.1 Especificación de RS
+- **Localización:** `27835_G3_ADS\Biblioteca de Trabajo\1. ELICITACION\1.1 Especificación de RS
 - **Tipo de ECS:** Documento (PDF)
-- **Fecha de creación:** 20/07/2025
+- **Fecha de creación:** 04/12/2025
 - **ID del proyecto:** 27835_G3_ADS
 
 ## Historial de Versiones del SRS
 
-| Versión                                            | Fecha      | Responsable     | Aprobado por  |
-| -------------------------------------------------- | ---------- | --------------- | ------------- |
-| Especificaciones SRS V1.pdf                        | 20/07/2025 | Simone Medina   | Tipán Oswaldo |
-| Especificaciones SRS V2 Requisitos Priorizados.pdf | 18/12/2025 | Zaith Mandangón | Tipán Oswaldo |
+| Versión           | Fecha      | Responsable       | Aprobado por  |
+| :---------------- | :--------- | :---------------- | :------------ |
+| **G3_SRS_V1.pdf** | 18/12/2025 | Fernando Sandoval | Oswaldo Tipán |
+| **G3_SRS_V1.pdf** | 20/01/2026 | Simone Medina     | Jenny Ruiz R. |
 
 Estas versiones reflejan la evolución del documento conforme al proceso de análisis y validación de requisitos. Cada versión corresponde a una revisión validada en la línea base.
-
-**Fecha Inicio:** 20/07/2025
-
-**Responsables:**
-Fernando Sandoval, Tipán Oswaldo, Simone Medina, Zaith Mandangón
