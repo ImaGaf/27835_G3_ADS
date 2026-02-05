@@ -15,8 +15,8 @@ Este directorio contiene los documentos que forman parte del Elemento de Configu
 
 ## Historial de Versiones de las Actas de Reunión
 
-| Versión       | Fecha      | Responsable   | Aprobado por                                               |
-| ------------- | ---------- | ------------- | ---------------------------------------------------------- |
-| AR_V1.0.0.pdf | 04/12/2025 | Tipán Oswaldo | Aprobado por Tipán Oswaldo, Simone Medina, Zaith Mandangón |
+| Versión             | Fecha      | Responsable   | Aprobado por                                               |
+| ------------------- | ---------- | ------------- | ---------------------------------------------------------- |
+| G3_Acta_Reunión.pdf | 04/12/2025 | Tipán Oswaldo | Aprobado por Tipán Oswaldo, Simone Medina, Zaith Mandangón |
 
 Estas versiones reflejan la evolución y formalización de las actas de reunión, aprobadas para el desarrollo del sistema.
