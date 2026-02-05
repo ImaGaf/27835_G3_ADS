@@ -18,8 +18,8 @@ export default function runCreditsTest() {
   const loginUrl = `${BASE_URL}/api/v1/auth/login`;
 
   const loginPayload = JSON.stringify({
-    email: 'test@example.com',
-    password: 'TestPassword123!',
+    email: 'oswaldoj.tipan@gmail.com',
+    password: 'Trabatrix2@',
   });
 
   const loginParams = {

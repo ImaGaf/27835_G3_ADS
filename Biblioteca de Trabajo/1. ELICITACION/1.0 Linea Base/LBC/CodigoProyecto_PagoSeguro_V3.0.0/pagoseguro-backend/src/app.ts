@@ -12,7 +12,8 @@ export function createApp(
   userRouter: Router,
   creditRouter: Router,
   paymentRouter: Router,
-  dashboardRouter: Router
+  dashboardRouter: Router,
+  voucherRouter: Router
 ): Express {
   const app = express();
 
@@ -57,6 +58,7 @@ export function createApp(
   app.use('/api/v1/credits', creditRouter);
   app.use('/api/v1/payments', paymentRouter);
   app.use('/api/v1/dashboard', dashboardRouter);
+  app.use('/api/v1/vouchers', voucherRouter);
 
   // Ruta 404
   app.use('*', (req, res) => {
