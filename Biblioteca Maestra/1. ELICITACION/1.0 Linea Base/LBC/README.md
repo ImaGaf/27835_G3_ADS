@@ -1,16 +1,17 @@
-# Proyecto PagoSeguro - Línea Base LBC - Implementación
+# Línea Base LBC - Implementación
 
-Aquí se encuentra todo el código fuente y scripts del proyecto, organizado para el desarrollo y pruebas.
+Esta carpeta contiene la versión estable del código fuente, scripts y configuraciones del proyecto **Pago Seguro AGROTAC**, organizados para el desarrollo, despliegue y pruebas.
 
-Contenido principal:
+## Contenido principal:
+* **Código Fuente:**
+  * **Frontend:** Aplicación SPA construida con React, Vite y TailwindCSS (`pagoseguro-frontend`).
+  * **Backend:** API RESTful construida con Node.js, Express y TypeScript (`pagoseguro-backend`).
+* **Base de Datos:** Esquemas de Prisma ORM y migraciones para PostgreSQL.
+* **Configuración:** Archivos de entorno, configuración de Docker (`docker-compose.yml`) y reglas de linter (`eslint`).
+* **Lógica de Negocio:** Servicios, controladores y gestión de autenticación/seguridad.
 
-- Código fuente frontend y backend (carpetas `frontend/` y `src/`)
-- Configuraciones y archivos del proyecto (`package.json`, `eslint.config.mjs`, `tsconfig.json`, etc.)
-- Recursos públicos y páginas HTML
-- Servicios y módulos para la lógica de la aplicación
+## Fecha de inicio:
+4 de Diciembre de 2025
 
-Fecha de inicio:
-10 de diciembre de 2025
-
-Responsables:
-Fernando Sandoval, Tipán Oswaldo, Simone Medina, Zaith Mandangón
+## Responsables:
+Fernando Sandoval, Zaith Manangón, Simone Medina, Oswaldo Tipán
