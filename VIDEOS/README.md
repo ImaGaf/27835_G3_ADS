@@ -28,6 +28,7 @@ Equipo de Desarrollo – Grupo 3:
 - Asignatura: Análisis y Diseño de Sistemas
 - Proyecto: Sistema de Gestión de Comprobantes y Cartera – Pago Seguro AGROTAC
 - Grupo: Grupo 3
+- link video: https://youtu.be/SQ7Ag-LSZng?si=agb37jpBqmtfet0p
 
 ## ℹ️ Información del Equipo
 
