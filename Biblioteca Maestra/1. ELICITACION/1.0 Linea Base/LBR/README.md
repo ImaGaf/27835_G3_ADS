@@ -1,12 +1,16 @@
 # Línea Base LBR - Requisitos
 
-Carpeta que contiene la especificación completa de requisitos del sistema PagoSeguro.
+Carpeta que contiene la especificación completa de requisitos del sistema **Pago Seguro AGROTAC**.
 
-Contenido principal:
-- Documento SRS (Especificación de Requisitos de Software)
+## Contenido principal:
+* Documento SRS (Especificación de Requisitos de Software)
+* Documentación de Entrevistas
 
-Fecha de inicio:
-11 de diciembre de 2025
+## Fecha de inicio:
+4 de Diciembre de 2025
 
-Responsables:
-Fernando Sandoval, Tipán Oswaldo, Simone Medina, Zaith Mandangón
+## Responsables:
+* Oswaldo Tipán
+* Fernando Sandoval
+* Zaith Manangón
+* Simone Medina
